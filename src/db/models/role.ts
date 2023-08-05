@@ -44,3 +44,5 @@ Role.init(
     underscored: false,
   }
 );
+
+export default Role;
