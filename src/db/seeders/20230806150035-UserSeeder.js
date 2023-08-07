@@ -1,6 +1,5 @@
 "use strict";
-
-import manage_password from "../../utils/manage_password";
+import bcrypt from "bcrypt";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -10,7 +9,7 @@ module.exports = {
         name: "John Doe",
         email: "johnoe@example.com",
         roleId: 2,
-        password: await manage_password.hashingPassword("admin123"),
+        password: bcrypt.hashSync("admin123", 10),
         accessToken: "adasd",
         verified: true,
         active: true,
@@ -21,7 +20,7 @@ module.exports = {
         name: "Jane Doe",
         email: "janedoe@example.com",
         roleId: 1,
-        password: await manage_password.hashingPassword("admin123"),
+        password: bcrypt.hashSync("admin123", 10),
         accessToken: "adasd",
         verified: true,
         active: true,
@@ -32,7 +31,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.bulkDelete("User", null, {});
+    await queryInterface.bulkDelete("Users", null, {});
     /**
      * Add commands to revert seed here.
      *

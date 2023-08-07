@@ -1,21 +1,23 @@
 import { Request, Response } from "express";
 import { errorResult } from "../utils/respons";
 import User from "../db/models/User";
+import { hashingPassword } from "../utils/manage_password";
 
 const Register = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const { name, email, password, confrimPassword } = req.body;
-    if (password !== confrimPassword) {
+    const { name, email, password, confirmPassword } = req.body;
+    if (password !== confirmPassword) {
       return res.status(400).json({
         status: 400,
         message: "password must be matching!",
         data: null,
       });
     }
-    const userRegistered = User.create({
+    const hashPassword = await hashingPassword(password);
+    const userRegistered = await User.create({
       name,
       email,
-      password,
+      password: hashPassword,
       active: true,
       verified: true,
       accessToken: "asdasd",
