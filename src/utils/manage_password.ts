@@ -10,9 +10,4 @@ const comparePassword = async (plaintext: string, hashed: any) => {
   return result;
 };
 
-// comparePassword(
-//   "admin123",
-//   "$2b$10$FLWyOqDHWM/osfHDO/6yWeei9B90O/gjk0PbQxJmmsMKiNUmQGodi"
-// ).then((res) => console.log(res));
-
 export { hashingPassword, comparePassword };
