@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, request } from "express";
 import Validator from "validatorjs";
-import { errorResult } from "../../utils/respons";
+import { errorResult } from "../../utils/Respons";
 import User from "../../db/models/User";
-
+import ManageToken from "../../utils/ManageToken";
 const RegisterValidation = async (
   req: Request,
   res: Response,
@@ -45,4 +45,21 @@ const RegisterValidation = async (
   }
 };
 
-export default { RegisterValidation };
+const UserAuth = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const bearerToken = req.headers["authorization"];
+    const authToken = bearerToken?.split(" ")[1];
+    const secretKey: any = process.env.JWT_TOKEN;
+    if (!authToken) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Unauthorized", data: null });
+    }
+    const result = ManageToken.verifyToken(authToken, secretKey);
+    next();
+  } catch (error) {
+    return errorResult(error, res, 400);
+  }
+};
+
+export default { RegisterValidation, UserAuth };

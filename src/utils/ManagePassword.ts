@@ -5,7 +5,7 @@ const hashingPassword = async (plaintext: string) => {
   return hash;
 };
 
-const comparePassword = async (plaintext: string, hashed: any) => {
+const comparePassword = async (plaintext: string, hashed: string) => {
   const result = await bcrypt.compare(plaintext, hashed);
   return result;
 };

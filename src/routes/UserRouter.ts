@@ -10,4 +10,6 @@ router.post(
   UserController.Register
 );
 
+router.post("/login", UserController.Login);
+
 export default router;
