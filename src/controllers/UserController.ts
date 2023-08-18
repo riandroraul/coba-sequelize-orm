@@ -3,7 +3,6 @@ import { errorResult } from "../utils/Respons";
 import { comparePassword, hashingPassword } from "../utils/ManagePassword";
 import ManageToken from "../utils/ManageToken";
 import User from "../db/models/User";
-import { where } from "sequelize";
 import Role from "../db/models/Role";
 
 const Register = async (req: Request, res: Response): Promise<Response> => {

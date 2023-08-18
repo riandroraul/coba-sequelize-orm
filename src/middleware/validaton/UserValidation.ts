@@ -1,9 +1,7 @@
-import { NextFunction, Request, Response, request } from "express";
+import { NextFunction, Request, Response } from "express";
 import Validator from "validatorjs";
 import { errorResult } from "../../utils/Respons";
 import User from "../../db/models/User";
-import ManageToken from "../../utils/ManageToken";
-import { JwtPayload } from "jsonwebtoken";
 const RegisterValidation = async (
   req: Request,
   res: Response,
@@ -46,28 +44,4 @@ const RegisterValidation = async (
   }
 };
 
-const UserAuth = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const bearerToken = req.headers["authorization"];
-    const authToken = bearerToken?.split(" ")[1];
-    const secretKey: any = process.env.JWT_TOKEN;
-    if (!authToken) {
-      return res
-        .status(400)
-        .json({ status: 400, message: "Unauthorized", data: null });
-    }
-    const result: any = ManageToken.verifyToken(authToken, secretKey);
-    if (!result) {
-      return res
-        .status(401)
-        .json({ status: 401, message: "Unauthorized", data: null });
-    }
-
-    res.locals.userEmail = result?.email;
-    next();
-  } catch (error) {
-    return errorResult(error, res, 400);
-  }
-};
-
-export default { RegisterValidation, UserAuth };
+export default { RegisterValidation };
