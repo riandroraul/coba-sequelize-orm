@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { errorResult } from "../utils/Respons";
-import User from "../db/models/User";
 import { comparePassword, hashingPassword } from "../utils/ManagePassword";
 import ManageToken from "../utils/ManageToken";
+import User from "../db/models/User";
+import { where } from "sequelize";
+import Role from "../db/models/Role";
 
 const Register = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -58,9 +60,9 @@ const Login = async (req: Request, res: Response): Promise<Response> => {
       verified: user.verified,
       active: user.active,
     };
-    const secretKeyToken: string = process.env.JWT_TOKEN || "";
-    const secretKeyRefToken = process.env.JWT_REFRESH_TOKEN || "";
-    const token = ManageToken.generateToken(userData, secretKeyToken, "10m");
+    const secretKeyToken = process.env.JWT_TOKEN as string;
+    const secretKeyRefToken = process.env.JWT_REFRESH_TOKEN as string;
+    const token = ManageToken.generateToken(userData, secretKeyToken, "1h");
     const refreshToken = ManageToken.generateToken(
       userData,
       secretKeyRefToken,
@@ -83,4 +85,114 @@ const Login = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
-export default { Register, Login };
+const RefreshToken = (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken);
+
+    if (!refreshToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Unauthorized", data: null });
+    }
+    const decodeUser: any = ManageToken.verifyToken(
+      refreshToken,
+      process.env.JWT_REFRESH_TOKEN || ""
+    );
+    console.log(decodeUser);
+
+    if (!decodeUser) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Unauthorized", data: null });
+    }
+    const secretKeyToken: string = process.env.JWT_TOKEN || "";
+    const token = ManageToken.generateToken(
+      {
+        name: decodeUser.name,
+        email: decodeUser.email,
+        roleId: decodeUser.roleId,
+        verified: decodeUser.verified,
+        active: decodeUser.active,
+      },
+      secretKeyToken,
+      "30s"
+    );
+
+    const user = {
+      name: decodeUser.name,
+      email: decodeUser.email,
+      roleId: decodeUser.roleId,
+      verified: decodeUser.verified,
+      active: decodeUser.active,
+      token,
+    };
+
+    return res
+      .status(200)
+      .json({ status: 200, message: "success", data: user });
+  } catch (error: any) {
+    console.log(error.message);
+    return errorResult(error, res, 400);
+  }
+};
+
+const UserDetail = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const email = res.locals.userEmail;
+    const user = await User.findOne({
+      where: {
+        email,
+      },
+      attributes: { exclude: ["password", "accessToken"] },
+      include: {
+        model: Role,
+        attributes: ["id", "roleName"],
+      },
+    });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: 404, message: "user not found", data: null });
+    }
+    return res
+      .status(200)
+      .json({ status: 200, message: "success", data: user });
+  } catch (error: any) {
+    console.log(error.message);
+    return errorResult(error, res, 400);
+  }
+};
+
+const UserLogout = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      return res
+        .status(200)
+        .json({ status: 200, message: "user logout", data: null });
+    }
+    const email = res.locals.userEmail;
+    const user = await User.findOne({
+      where: {
+        email,
+      },
+      attributes: { exclude: ["password", "accessToken"] },
+    });
+    if (!user) {
+      return res
+        .status(200)
+        .json({ status: 200, message: "user logout", data: null });
+    }
+    await user.update({ accessToken: null }, { where: { email } });
+    res.clearCookie("refreshToken");
+    return res
+      .status(200)
+      .json({ status: 200, message: "user logout", data: null });
+  } catch (error: any) {
+    console.log(error.message);
+    return errorResult(error, res, 400);
+  }
+};
+
+export default { Register, Login, RefreshToken, UserDetail, UserLogout };

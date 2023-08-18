@@ -11,5 +11,8 @@ router.post(
 );
 
 router.post("/login", UserController.Login);
+router.get("/refresh-token", UserController.RefreshToken);
+router.get("/current-user", UserValidation.UserAuth, UserController.UserDetail);
+router.get("/logout", UserValidation.UserAuth, UserController.UserLogout);
 
 export default router;

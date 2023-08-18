@@ -3,6 +3,7 @@ import Validator from "validatorjs";
 import { errorResult } from "../../utils/Respons";
 import User from "../../db/models/User";
 import ManageToken from "../../utils/ManageToken";
+import { JwtPayload } from "jsonwebtoken";
 const RegisterValidation = async (
   req: Request,
   res: Response,
@@ -55,7 +56,14 @@ const UserAuth = (req: Request, res: Response, next: NextFunction) => {
         .status(400)
         .json({ status: 400, message: "Unauthorized", data: null });
     }
-    const result = ManageToken.verifyToken(authToken, secretKey);
+    const result: any = ManageToken.verifyToken(authToken, secretKey);
+    if (!result) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Unauthorized", data: null });
+    }
+
+    res.locals.userEmail = result?.email;
     next();
   } catch (error) {
     return errorResult(error, res, 400);
