@@ -12,7 +12,8 @@ const getRoles = async (req: Request, res: Response): Promise<Response> => {
       message: "success",
       data: roles,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error.message);
     return errorResult(error, res, 500);
   }
 };
@@ -33,7 +34,8 @@ const getRoleById = async (req: Request, res: Response): Promise<Response> => {
       message: "Data founded!",
       data: findRole,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error.message);
     return errorResult(error, res, 400);
   }
 };
@@ -75,7 +77,8 @@ const updateRole = async (req: Request, res: Response): Promise<Response> => {
       message: "Data updated!",
       data: role,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error.message);
     return errorResult(error, res, 400);
   }
 };
@@ -97,7 +100,8 @@ const deleteRole = async (req: Request, res: Response): Promise<Response> => {
       message: "Data deleted!",
       data: deletedRole,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error.message);
     return errorResult(error, res, 400);
   }
 };

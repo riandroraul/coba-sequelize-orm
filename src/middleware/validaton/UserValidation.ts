@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import Validator from "validatorjs";
 import { errorResult } from "../../utils/Respons";
 import User from "../../db/models/User";
+
 const RegisterValidation = async (
   req: Request,
   res: Response,

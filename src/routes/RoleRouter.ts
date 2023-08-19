@@ -1,37 +1,37 @@
-import express from "express";
+import { Router } from "express";
 import RoleController from "../controllers/RoleController";
-import Authentication from "../middleware/auth";
+import Authorization from "../middleware/auth";
 
-const router = express.Router();
+const router = Router();
 
 router.get(
   "/",
-  Authentication.UserAuth,
-  Authentication.UserVerification,
+  Authorization.UserAuth,
+  Authorization.UserVerification,
   RoleController.getRoles
 );
 router.get(
   "/:id",
-  Authentication.UserAuth,
-  Authentication.UserVerification,
+  Authorization.UserAuth,
+  Authorization.UserVerification,
   RoleController.getRoleById
 );
 router.post(
   "/create",
-  Authentication.UserAuth,
-  Authentication.AdminVerification,
+  Authorization.UserAuth,
+  Authorization.AdminVerification,
   RoleController.createRole
 );
 router.put(
   "/update/:id",
-  Authentication.UserAuth,
-  Authentication.AdminVerification,
+  Authorization.UserAuth,
+  Authorization.AdminVerification,
   RoleController.updateRole
 );
 router.delete(
   "/delete/:id",
-  Authentication.UserAuth,
-  Authentication.SuperAdminVerification,
+  Authorization.UserAuth,
+  Authorization.SuperAdminVerification,
   RoleController.deleteRole
 );
 
