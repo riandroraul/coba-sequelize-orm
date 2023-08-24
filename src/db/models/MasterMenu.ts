@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 
 import connection from "../../config/db_connection";
+import Submenu from "./Submenu";
 
 interface MasterMenuAttributes {
   id?: number;
@@ -60,5 +61,7 @@ MasterMenu.init(
     underscored: false,
   }
 );
+
+MasterMenu.hasMany(Submenu);
 
 export default MasterMenu;
